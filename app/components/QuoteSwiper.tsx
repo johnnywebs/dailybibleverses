@@ -63,7 +63,7 @@ export default function QuoteSwiper() {
 			.join("");
 		}
 		
-		const newQuote = {
+		const newQuote: Verse = {
 			text: flattenContent(verse.content),
 			bible_version: `${bible_translation}`,
 			reference: `${book.name} ${chapter}:${verse.number}`,
