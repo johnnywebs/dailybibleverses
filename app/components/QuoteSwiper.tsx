@@ -14,12 +14,6 @@ export default function QuoteSwiper() {
 	const swiperRef = useRef<any>(null);
 
 	const translation = "eng_kjv";
-	
-	type BBook = {
-		id: string;
-		name: string;
-		numberOfChapters: number;
-	};
 
 	useEffect(() => {
 		loadBooks();
@@ -39,7 +33,7 @@ export default function QuoteSwiper() {
 		}
 	}
 
-	async function fetchRandomVerse(bookList: BBook[], bible_translation: string) {
+	async function fetchRandomVerse(bookList:any[], bible_translation: string) {
 		setLoading(true);
 		if (!bookList || bookList.length === 0) return;
 
@@ -69,7 +63,7 @@ export default function QuoteSwiper() {
 			reference: `${book.name} ${chapter}:${verse.number}`,
 		};
 
-		setQuotes(newQuote);
+		setQuotes(newQuote::any[]);
 		setTimeout(() => swiperRef.current?.slideNext(), 50);
 	}
 
