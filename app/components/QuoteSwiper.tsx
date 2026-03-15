@@ -7,7 +7,7 @@ import { HeartIcon, ShareIcon } from "@heroicons/react/24/solid";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function QuoteSwiper() {
-	const [quotes, setQuotes] = useState<any[]>([]);
+	const [quotes, setQuotes] = useState<Verse[]>([]);
 	const [books, setBooks] = useState<any[]>([]);
 	const [bible, setBible] = useState<any[]>([]);
 	const [loading, setLoading] = useState(true);
@@ -18,6 +18,12 @@ export default function QuoteSwiper() {
 	useEffect(() => {
 		loadBooks();
 	}, []);
+	
+	type Verse = {
+		text: string;
+		bible_version: string;
+		reference: string;
+	};
 	
 	async function loadBooks() {
 		try {
