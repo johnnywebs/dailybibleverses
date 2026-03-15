@@ -63,7 +63,7 @@ export default function QuoteSwiper() {
 			reference: `${book.name} ${chapter}:${verse.number}`,
 		};
 
-		setQuotes(newQuote::any[]);
+		setQuotes(newQuote:any[]);
 		setTimeout(() => swiperRef.current?.slideNext(), 50);
 	}
 
