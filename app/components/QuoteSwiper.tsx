@@ -52,7 +52,7 @@ export default function QuoteSwiper() {
 		if (!verses || verses.length === 0) return await fetchRandomVerse(bookList, bible_translation);
 		const verse = verses[Math.floor(Math.random() * verses.length)];
 		
-		function flattenContent(content) {
+		function flattenContent(content:string[]) {
 			return content
 			.map((c) => {
 				if (typeof c === "string") return c; // plain string
@@ -63,8 +63,6 @@ export default function QuoteSwiper() {
 			.join("");
 		}
 		
-		console.warn(verse.content, verse.content[0]);
-
 		const newQuote = {
 			text: flattenContent(verse.content),
 			bible_version: `${bible_translation}`,
