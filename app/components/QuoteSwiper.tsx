@@ -49,7 +49,7 @@ export default function QuoteSwiper() {
 		const res = await fetch(`https://bible.helloao.org/api/${translation}/${book.id}/${chapter}.json`);
 		const data = await res.json();
 		const verses = data.chapter?.content;
-		if (!verses || verses.length === 0) return await fetchRandomVerse(bookList);
+		if (!verses || verses.length === 0) return await fetchRandomVerse(bookList, bible_translation);
 		const verse = verses[Math.floor(Math.random() * verses.length)];
 		
 		function flattenContent(content) {
