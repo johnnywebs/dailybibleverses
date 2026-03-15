@@ -16,24 +16,24 @@ export default function QuoteSwiper() {
 	const translation = "eng_kjv";
 
 	useEffect(() => {
-		async function loadBooks() {
-			try {
-				const res = await fetch(`https://bible.helloao.org/api/${translation}/books.json`);
-				const data = await res.json();
-				setBooks(data.books);
-				setBible(data.translation.englishName);
-				await fetchRandomVerse(data.books, data.translation.englishName);
-			} catch (err) {
-				console.error(err);
-			} finally {
-				setLoading(false);
-			}
-		}
-		
 		loadBooks();
 	}, []);
+	
+	async function loadBooks() {
+		try {
+			const res = await fetch(`https://bible.helloao.org/api/${translation}/books.json`);
+			const data = await res.json();
+			setBooks(data.books);
+			setBible(data.translation.englishName);
+			await fetchRandomVerse(data.books, data.translation.englishName);
+		} catch (err) {
+			console.error(err);
+		} finally {
+			setLoading(false);
+		}
+	}
 
-	async function fetchRandomVerse(bookList = books, bible_translation = bible) {
+	async function fetchRandomVerse(bookList, bible_translation) {
 		setLoading(true);
 		if (!bookList || bookList.length === 0) return;
 
@@ -43,18 +43,21 @@ export default function QuoteSwiper() {
 		const res = await fetch(`https://bible.helloao.org/api/${translation}/${book.id}/${chapter}.json`);
 		const data = await res.json();
 		const verses = data.chapter?.content;
-		if (!verses || verses.length === 0) return fetchRandomVerse(bookList);
+		if (!verses || verses.length === 0) return await fetchRandomVerse(bookList);
 		const verse = verses[Math.floor(Math.random() * verses.length)];
 		
-		function flattenContent(content: any[]): string {
+		function flattenContent(content) {
 			return content
 			.map((c) => {
-				if (typeof c === "string") return c;
-				if (c.lineBreak) return "\n";
-				return "";
+				if (typeof c === "string") return c; // plain string
+				if (c.lineBreak) return "\n";        // line break
+				if (c.text) return c.text;           // text from object like { text: "...", wordsOfJesus: true }
+				return "";                           // fallback
 			})
 			.join("");
 		}
+		
+		console.warn(verse.content, verse.content[0]);
 
 		const newQuote = {
 			text: flattenContent(verse.content),
@@ -62,12 +65,8 @@ export default function QuoteSwiper() {
 			reference: `${book.name} ${chapter}:${verse.number}`,
 		};
 
-		setQuotes((prev) => {
-			const updated = [...prev, newQuote];
-			setTimeout(() => swiperRef.current?.slideNext(), 50);
-			setLoading(false);
-			return updated;
-		});
+		setQuotes(newQuote);
+		setTimeout(() => swiperRef.current?.slideNext(), 50);
 	}
 
 	if (loading)
@@ -79,16 +78,16 @@ export default function QuoteSwiper() {
 
 	return (
 		<div className="w-full max-w-sm mx-auto p-4">
-			<button onClick={() => fetchRandomVerse()} className="w-full py-3 rounded-md bg-blue-500 text-white font-semibold hover:bg-blue-600 transition shadow-sm mb-6">
+			<button onClick={() => loadBooks()} className="w-full py-3 rounded-md bg-blue-500 text-white font-semibold hover:bg-blue-600 transition shadow-sm mb-6">
 				Next Verse →
 			</button>
 			
 			<Swiper slidesPerView={1} onSwiper={(swiper) => (swiperRef.current = swiper)}>
-				{quotes.map((quote, index) => (
-					<SwiperSlide key={index}>
+				{quotes && (
+					<SwiperSlide>
 						<AnimatePresence mode="wait">
 							<motion.div
-								key={index}
+								key={quotes.reference}
 								initial={{ opacity: 0, y: 20 }}
 								animate={{ opacity: 1, y: 0 }}
 								exit={{ opacity: 0, y: -20 }}
@@ -96,18 +95,18 @@ export default function QuoteSwiper() {
 							>
 								<div className="max-h-[420px] overflow-y-auto rounded-md p-6 flex flex-col justify-between bg-white border border-gray-200">
 									<p className="text-lg sm:text-xl leading-relaxed text-gray-900">
-										{quote.text}
+										{quotes.text}
 									</p>
 									<p className="mt-4 text-sm text-gray-500 text-right">
-										<small className="font-semibold">{quote.bible_version}</small>
+										<small className="font-semibold">{quotes.bible_version}</small>
 										<br/>
-										{quote.reference}
+										{quotes.reference}
 									</p>
 								</div>
 							</motion.div>
 						</AnimatePresence>
 					</SwiperSlide>
-				))}
+				)}
 			</Swiper>
 		</div>
 	);
