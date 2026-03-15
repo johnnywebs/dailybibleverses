@@ -33,7 +33,7 @@ export default function QuoteSwiper() {
 		}
 	}
 
-	async function fetchRandomVerse(bookList: string[], bible_translation: string) {
+	async function fetchRandomVerse(bookList: books, bible_translation: string) {
 		setLoading(true);
 		if (!bookList || bookList.length === 0) return;
 
